@@ -6,6 +6,8 @@ from scipy.integrate import solve_ivp
 import matplotlib.animation as animation
 from matplotlib.patches import FancyArrowPatch
 
+SAVE_ANIMATION = False  # Set to True to generate the .gif file
+
 # Constants
 G = 6.67430e-11         # gravitational constant (m^3 kg^-1 s^-2)
 M_earth = 5.972e24      # mass of Earth (kg)
@@ -148,29 +150,30 @@ ani = animation.FuncAnimation(fig, animate, frames=len(x), init_func=init,
 
 plt.show() 
 
-# Subsample for the GIF to prevent freezing (e.g., every 50th frame)
-step = 50 
-x_gif = x[::step]
-y_gif = y[::step]
-vx_gif = vx[::step]
-vy_gif = vy[::step]
-
-# Update the animation function to use the subsampled data
-def animate(i):
-    satellite_dot.set_data([x_gif[i]], [y_gif[i]])
-    trail_line.set_data(x_gif[:i+1], y_gif[:i+1])
+if SAVE_ANIMATION:
+    # Subsample for the GIF 
+    step = 50 
+    x_gif = x[::step]
+    y_gif = y[::step]
+    vx_gif = vx[::step]
+    vy_gif = vy[::step]
     
-    # Update velocity vector using subsampled data
-    dx = vx_gif[i] * arrow_scale
-    dy = vy_gif[i] * arrow_scale
-    velocity_vec.set_positions((x_gif[i], y_gif[i]), (x_gif[i] + dx, y_gif[i] + dy))
-    return satellite_dot, trail_line, velocity_vec
-
-# Create animation with fewer frames
-ani = animation.FuncAnimation(fig, animate, frames=len(x_gif), init_func=init,
-                              interval=40, blit=True, repeat=True)
-
-# Use a lower DPI and fewer FPS to save memory
-print("Saving optimized animation...")
-ani.save('orbit_simulation.gif', writer='pillow', fps=20, dpi=50)
-print("Animation saved successfully.")
+    # Update the animation function to use the subsampled data
+    def animate(i):
+        satellite_dot.set_data([x_gif[i]], [y_gif[i]])
+        trail_line.set_data(x_gif[:i+1], y_gif[:i+1])
+        
+        # Update velocity vector using subsampled data
+        dx = vx_gif[i] * arrow_scale
+        dy = vy_gif[i] * arrow_scale
+        velocity_vec.set_positions((x_gif[i], y_gif[i]), (x_gif[i] + dx, y_gif[i] + dy))
+        return satellite_dot, trail_line, velocity_vec
+    
+    # Create animation with fewer frames
+    ani = animation.FuncAnimation(fig, animate, frames=len(x_gif), init_func=init,
+                                  interval=40, blit=True, repeat=True)
+    
+    # Use a lower DPI and fewer FPS to save memory
+    print("Saving optimized animation...")
+    ani.save('orbit_simulation.gif', writer='pillow', fps=20, dpi=50)
+    print("Animation saved successfully.")
