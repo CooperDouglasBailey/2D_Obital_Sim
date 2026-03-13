@@ -1,4 +1,4 @@
-# 2D_Obital_Sim
+# 2D_Orbital_Sim
 Python-based orbital mechanics simulation utilizing RK4 numerical methods and atmospheric drag models to visualize satellite dynamics and orbital decay.
 
 # GIF
